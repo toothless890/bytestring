@@ -1,12 +1,21 @@
+// provided by chatGPT
 package com.mycompany.app;
-    import javax.sound.sampled.*;
-    import java.util.Arrays;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.TargetDataLine;
 
 public class AudioToBinary {
 
-    public static void main(String[] args) {
-        
-    }
 
     public static byte[] recordAudio(int sampleRate, int durationInSeconds) {
         try {
@@ -60,4 +69,29 @@ public class AudioToBinary {
         // System.out.println(binaryData.toString());
         return binaryData.toString();
     }
+
+    public static byte[] readWavFile(String path) throws FileNotFoundException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
+
+        int read;
+        byte[] buff = new byte[1024];
+        try {
+            while ((read = in.read(buff)) > 0) {
+                out.write(buff, 0, read);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try {
+            out.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        byte[] audioBytes = out.toByteArray();
+        return audioBytes;
+    }
+
 }
