@@ -9,7 +9,7 @@ public class Audio {
 
 
     public static byte[] convertBinaryToAFSK(String binaryData, int sampleRate, int baudRate) {
-        double frequencyMark = 1200; // Frequency for binary '0'
+        double frequencyMark = 1600; // Frequency for binary '0'
         double frequencySpace = 2500; // Frequency for binary '1'
 
         int samplesPerBit = sampleRate / baudRate;

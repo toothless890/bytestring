@@ -19,7 +19,7 @@ import javax.sound.sampled.TargetDataLine;
 
 public class AudioToBinary {
     private static final double LOUDNESS_THRESHOLD = 0.04;
-    private static final int ROLLING_AVERAGE_WINDOW = 20; // Adjust the window size based on your requirements
+    private static final int ROLLING_AVERAGE_WINDOW = 10; // Adjust the window size based on your requirements
 
     public static byte[] recordAudio(int sampleRate, int durationInSeconds) {
         try {
@@ -99,7 +99,6 @@ public class AudioToBinary {
         return sum / rollingAverageQueue.size();
     }
 
-
     public static String demodulateAFSK(byte[] audioSignal, int sampleRate, int baudRate) {
         double frequencyMark = 1200;
         double frequencySpace = 2500;
@@ -107,7 +106,11 @@ public class AudioToBinary {
 
         StringBuilder binaryData = new StringBuilder();
 
-        for (int i = 0; i < audioSignal.length / samplesPerBit; i++) {
+        //filter signal
+
+        byte[] filteredData = BandpassFilter.applyBandpassFilter(audioSignal, frequencyMark-90, frequencySpace+200, sampleRate);
+        Audio.playAudioSignal(filteredData, sampleRate);
+        for (int i = 0; i < filteredData.length / samplesPerBit; i++) {
             double energyMark = 0;
             double energySpace = 0;
 
@@ -115,8 +118,8 @@ public class AudioToBinary {
                 double angleMark = 2.0 * Math.PI * j / (double) sampleRate * frequencyMark;
                 double angleSpace = 2.0 * Math.PI * j / (double) sampleRate * frequencySpace;
 
-                energyMark += audioSignal[i * samplesPerBit + j] * Math.sin(angleMark);
-                energySpace += audioSignal[i * samplesPerBit + j] * Math.sin(angleSpace);
+                energyMark += filteredData[i * samplesPerBit + j] * Math.sin(angleMark);
+                energySpace += filteredData[i * samplesPerBit + j] * Math.sin(angleSpace);
             }
 
             binaryData.append(energyMark > energySpace ? '0' : '1');

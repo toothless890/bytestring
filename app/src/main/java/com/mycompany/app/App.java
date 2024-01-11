@@ -49,30 +49,29 @@ public class App {
 
     public static void main(String[] args) throws FileNotFoundException {
         long startTime = System.nanoTime();
-        String data = getRawData("test.txt");
+        String data = getRawData("t.txt");
 
         long readTime = System.nanoTime();
         long totalTime = readTime - startTime;
         // System.err.println(data);
 
         int sampleRate = 44100; // Sample rate in Hz
-        int baudRate = 12; // Baud rate in bits per second
+        int baudRate = 1200; // Baud rate in bits per second
 
-        // byte[] audioSignal = Audio.convertBinaryToAFSK(data, sampleRate, baudRate);
+        byte[] audioSignal = Audio.convertBinaryToAFSK(data, sampleRate, baudRate);
         // Audio.playAudioSignal(audioSignal, sampleRate);
 
         // int sampleRate = 44100;
         // int baudRate = 1200;
         int durationInSeconds = 15; // Adjust this based on the expected duration of your recorded signal
 
-        byte[] recordedAudio = AudioToBinary.recordAudio(sampleRate, durationInSeconds);
+        // byte[] recordedAudio = AudioToBinary.recordAudio(sampleRate, durationInSeconds);
         System.out.println("Recording complete!");
         // byte[] testAudio = AudioToBinary.readWavFile("test.wav");
 
-        String binaryData = AudioToBinary.demodulateAFSK(recordedAudio, sampleRate, baudRate);
-
-
-        // String binaryData = AudioToBinary.demodulateAFSK(audioSignal, sampleRate, baudRate);
+        // String binaryData = AudioToBinary.demodulateAFSK(recordedAudio, sampleRate, baudRate);
+        
+        String binaryData = AudioToBinary.demodulateAFSK(audioSignal, sampleRate, baudRate);
         // System.out.println("Decoded Binary Data: " + binaryData);
         writeFile(binaryData);
 
