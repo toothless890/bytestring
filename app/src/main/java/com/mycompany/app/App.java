@@ -49,7 +49,7 @@ public class App {
 
     public static void main(String[] args) throws FileNotFoundException {
         long startTime = System.nanoTime();
-        String data = getRawData("t.txt");
+        String data = getRawData("2b.jpeg");
 
         long readTime = System.nanoTime();
         long totalTime = readTime - startTime;
@@ -64,7 +64,6 @@ public class App {
         // int sampleRate = 44100;
         // int baudRate = 1200;
         int durationInSeconds = 15; // Adjust this based on the expected duration of your recorded signal
-
         // byte[] recordedAudio = AudioToBinary.recordAudio(sampleRate, durationInSeconds);
         System.out.println("Recording complete!");
         // byte[] testAudio = AudioToBinary.readWavFile("test.wav");
@@ -76,7 +75,8 @@ public class App {
         writeFile(binaryData);
 
         // writeFile(data);
-
+        // System.out.println(data);
+        // System.out.println(binaryData);       
  
     }
 }

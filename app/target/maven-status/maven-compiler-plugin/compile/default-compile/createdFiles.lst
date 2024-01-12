@@ -1,1 +1,5 @@
+com/mycompany/app/AudioToBinary.class
+com/mycompany/app/File.class
+com/mycompany/app/Audio.class
+com/mycompany/app/BandpassFilter.class
 com/mycompany/app/App.class

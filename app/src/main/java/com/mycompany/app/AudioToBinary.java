@@ -18,8 +18,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
 public class AudioToBinary {
-    private static final double LOUDNESS_THRESHOLD = 0.04;
-    private static final int ROLLING_AVERAGE_WINDOW = 10; // Adjust the window size based on your requirements
+    private static final double LOUDNESS_THRESHOLD = 0.07;
+    private static final int ROLLING_AVERAGE_WINDOW = 20; // Adjust the window size based on your requirements
 
     public static byte[] recordAudio(int sampleRate, int durationInSeconds) {
         try {
@@ -108,8 +108,8 @@ public class AudioToBinary {
 
         //filter signal
 
-        byte[] filteredData = BandpassFilter.applyBandpassFilter(audioSignal, frequencyMark-90, frequencySpace+200, sampleRate);
-        Audio.playAudioSignal(filteredData, sampleRate);
+        byte[] filteredData = BandpassFilter.applyBandpassFilter(audioSignal, frequencyMark-100, frequencySpace+900, sampleRate);
+        // Audio.playAudioSignal(filteredData, sampleRate);
         for (int i = 0; i < filteredData.length / samplesPerBit; i++) {
             double energyMark = 0;
             double energySpace = 0;

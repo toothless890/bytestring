@@ -20,7 +20,6 @@ public class BandpassFilter {
         // Create a bandpass filter in the frequency domain using a Butterworth filter
         double[] filter = createButterworthBandpassFilter(signal.length, lowFreq, highFreq, sampleRate, 5);
         // Apply the filter to the transformed signal
-        double[] filteredSignal = new double[signal.length];
         for (int i = 0; i < signal.length / 2; i++) {
             int index = i * 2;
             double magnitude = Math.hypot(signal[index], signal[index + 1]);
@@ -29,23 +28,24 @@ public class BandpassFilter {
             double freq = i * sampleRate / signal.length;
             if (freq >= lowFreq && freq <= highFreq) {
                 double filteredMagnitude = magnitude * filter[i];
+                double gain = 1.0; // Adjust this gain factor as needed
                 double phase = Math.atan2(signal[index + 1], signal[index]);
-                filteredSignal[index] = filteredMagnitude * Math.cos(phase);
-                filteredSignal[index + 1] = filteredMagnitude * Math.sin(phase);
+                signal[index] = gain * filteredMagnitude * Math.cos(phase);
+                signal[index + 1] = gain * filteredMagnitude * Math.sin(phase);
             } else {
                 // If the frequency is outside the desired range, set the magnitude to zero
-                filteredSignal[index] = 0.0;
-                filteredSignal[index + 1] = 0.0;
+                signal[index] = 0.5;
+                signal[index + 1] = 0.5;
             }
         }
 
         // Apply inverse FFT using JTransforms to the filtered signal
-        fft.realInverse(filteredSignal, true);
+        fft.realInverse(signal, true);
 
         // Convert the filtered signal back to byte array
-        byte[] filteredData = new byte[filteredSignal.length];
-        for (int i = 0; i < filteredSignal.length; i++) {
-            filteredData[i] = (byte) filteredSignal[i];
+        byte[] filteredData = new byte[signal.length];
+        for (int i = 0; i < signal.length; i++) {
+            filteredData[i] = (byte) signal[i];
         }
 
         return filteredData;
@@ -67,16 +67,29 @@ public class BandpassFilter {
     }
 
     private static double butterworthFilter(double freq, double lowFreq, double highFreq, int order) {
-        double omega = 2.0 * Math.PI * freq / (highFreq - lowFreq);
-        double x = Math.sin(0.5 * omega);
-        double y = 1.0 / Math.cos(0.5 * omega);
-
-        double alpha = x / y;
-        double beta = (0.5 - alpha) / (0.5 + alpha);
-
-        return 1.0 / (1.0 + Math.pow(beta, order));
+        double centerFreq = (lowFreq + highFreq) / 2.0;
+        double bandwidth = highFreq - lowFreq;
+    
+        double wc = 2.0 * Math.PI * centerFreq; // Center frequency in radians
+        double bw = 2.0 * Math.PI * bandwidth;  // Bandwidth in radians
+    
+        // Calculate pole locations for a Butterworth filter
+        Complex[] poles = new Complex[order];
+        for (int k = 0; k < order; k++) {
+            double theta = (2.0 * k + 1.0) * Math.PI / (2.0 * order);
+            poles[k] = new Complex(-wc + bw * Math.cos(theta), bw * Math.sin(theta));
+        }
+    
+        // Calculate the product of the transfer functions (H(s) = (s - p1) * (s - p2) * ...)
+        Complex transferFunction = Complex.ONE;
+        for (int k = 0; k < order; k++) {
+            transferFunction = transferFunction.multiply(Complex.ONE.subtract(Complex.I.multiply(freq / wc).divide(poles[k])));
+        }
+    
+        // The magnitude of the transfer function is the filter response
+        return transferFunction.abs();
     }
-
+    
     // public static void main(String[] args) {
     // // Example usage
     // try {
